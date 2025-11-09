@@ -1,4 +1,5 @@
 ﻿using System.Collections.Frozen;
+using System.Diagnostics;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -84,7 +85,7 @@ public sealed class TypeData
 			return name = builder.ToString();
 		}
 
-		if (Keywords.HasFlag(Modifiers.Generic) || Keywords.HasFlag(Modifiers.Nullable))
+		if (Keywords.HasFlag(Modifiers.Generic) || (Keywords.HasFlag(Modifiers.Nullable | Modifiers.ValueType)))
 		{
 			StringBuilder builder = new(64);
 
@@ -138,9 +139,9 @@ public sealed class TypeData
 
 		// Early exit for special types.
 
-		if (Nullable.GetUnderlyingType(Type) is not null) return modifiers | Modifiers.Nullable | Modifiers.ValueType;
-
 		if (_keywords.ContainsKey(Type)) return modifiers | Modifiers.Keyword;
+
+		if (Nullable.GetUnderlyingType(Type) is not null) return modifiers | Modifiers.Nullable | Modifiers.ValueType;
 
 		// Complex type modifiers (Nullable<T>, delegate, X<T>)
 
