@@ -1,9 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.14.36105.17
+# Visual Studio Version 18
+VisualStudioVersion = 18.0.11109.219
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Analyzer", "Analyzer.csproj", "{326F7F22-3EEE-4C23-BF18-250CE8E54532}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MetaDump", "MetaDump.csproj", "{326F7F22-3EEE-4C23-BF18-250CE8E54532}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MetaDump.Test", "..\MetaDump.Test\MetaDump.Test.csproj", "{98B93F6E-BA05-4E3F-BACC-F8483A7FA561}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{326F7F22-3EEE-4C23-BF18-250CE8E54532}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{326F7F22-3EEE-4C23-BF18-250CE8E54532}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{326F7F22-3EEE-4C23-BF18-250CE8E54532}.Release|Any CPU.Build.0 = Release|Any CPU
+		{98B93F6E-BA05-4E3F-BACC-F8483A7FA561}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{98B93F6E-BA05-4E3F-BACC-F8483A7FA561}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{98B93F6E-BA05-4E3F-BACC-F8483A7FA561}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{98B93F6E-BA05-4E3F-BACC-F8483A7FA561}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,7 +1,8 @@
 {
   "profiles": {
     "Analyzer": {
-      "commandName": "Project"
+      "commandName": "Project",
+      "nativeDebugging": false
     }
   }
 }

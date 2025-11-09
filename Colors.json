@@ -1,0 +1,17 @@
+﻿{
+	"NamedColors": {
+		        "Standard": "#dcdcdc",
+		          "String": "#d69d85",
+		          "Struct": "#86c691",
+		           "Class": "#4ec9b0",
+		       "Interface": "#b4d7a3",
+		         "Literal": "#b8d7a3",
+		          "Method": "#dcdcaa",
+		       "Parameter": "#9cdcfe",
+		         "Keyword": "#569cd6",
+		"GenericParameter": "#b8d7a3",
+		        "Operator": "#b4b4b4"
+	},
+
+	"LayerColors": [ "#e06c75", "#e5c07b", "#98c379", "#56b6c2", "#c678dd", "#d19a66", "#61afef", "#abb2bf", "#89b8c2" ]
+}
