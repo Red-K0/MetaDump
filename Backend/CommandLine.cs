@@ -6,6 +6,17 @@ namespace MetaDump.Backend;
 
 internal static class CommandLine
 {
+	private static readonly FrozenDictionary<string, Arguments> ArgumentMap = new Dictionary<string, Arguments>(StringComparer.OrdinalIgnoreCase)
+	{
+		["-h"] = Help,       ["--help"]     = Help,
+		["-a"] = AllTypes,   ["--alltypes"] = AllTypes,
+		["-i"] = Imports,    ["--imports"]  = Imports,
+		["-p"] = Paths,      ["--paths"]    = Paths,
+		["-m"] = Monotone,   ["--monotone"] = Monotone,
+		["-q"] = Silent,     ["--quiet"]    = Silent,
+		["-e"] = Explicit,   ["--explicit"] = Explicit
+	}.ToFrozenDictionary();
+
 	public static OutputMode OutputMode = OutputMode.PlainText;
 	public static Arguments Arguments;
 
@@ -140,16 +151,6 @@ internal static class CommandLine
 
 		return true;
 	}
-
-	private static readonly FrozenDictionary<string, Arguments> ArgumentMap = new Dictionary<string, Arguments>(StringComparer.OrdinalIgnoreCase)
-	{
-		["-h"] = Help,       ["--help"]     = Help,
-		["-a"] = AllTypes,   ["--alltypes"] = AllTypes,
-		["-i"] = Imports,    ["--imports"]  = Imports,
-		["-p"] = Paths,      ["--paths"]    = Paths,
-		["-m"] = Monotone,   ["--monotone	"] = Monotone,
-		["-q"] = Silent,     ["--quiet"]    = Silent,
-	}.ToFrozenDictionary();
 }
 
 [Flags]
@@ -162,6 +163,7 @@ internal enum Arguments : int
 	Monotone = 0b0001_0000,
 	PipeFile = 0b0010_0000,
 	  Silent = 0b0100_0000,
+	Explicit = 0b1000_0000
 }
 
 internal enum OutputMode

@@ -1,7 +1,6 @@
 ﻿using System.Buffers;
-using System.Collections.Concurrent;
 using System.Collections.Frozen;
-using System.Diagnostics;
+using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
 using MetaDump.Backend;
@@ -23,9 +22,9 @@ internal static class Utilities
 		[AccessModifier.Public]            = "public",
 	}.ToFrozenDictionary();
 
-	private static List<IMemberData> _localMembers = new(64);
-	private static HashSet<string> _fieldFilter = [];
-	private static HashSet<int> _methodFilter = [];
+	private static readonly List<IMemberData> _localMembers = new(64);
+	private static readonly HashSet<string> _fieldFilter = [];
+	private static readonly HashSet<int> _methodFilter = [];
 
 	public static string GetAccessString(AccessModifier modifier) => _accessModifierMap[modifier].WithColor(Color.Keyword);
 
@@ -37,6 +36,8 @@ internal static class Utilities
 
 		EventInfo[] e = null!; PropertyInfo[] p = null!; MethodInfo[] m = type.GetMethods(Flags); FieldInfo[] f = type.GetFields(Flags);
 
+		bool filter = !CommandLine.Arguments.HasFlag(Arguments.Explicit);
+
 		Parallel.Invoke(
 			() => m = type.GetMethods(),
 			() => f = type.GetFields(),
@@ -44,7 +45,7 @@ internal static class Utilities
 			{
 				e = type.GetEvents(Flags);
 
-				foreach (EventInfo e in e)
+				if (filter) foreach (EventInfo e in e)
 				{
 					if (e.   AddMethod is { } add) _methodFilter.Add(add.MetadataToken);
 					if (e.RemoveMethod is { } rem) _methodFilter.Add(rem.MetadataToken);
@@ -55,7 +56,7 @@ internal static class Utilities
 			{
 				p = type.GetProperties(Flags);
 
-				foreach (PropertyInfo p in p)
+				if (filter) foreach (PropertyInfo p in p)
 				{
 					if (p.GetMethod is { } get) _methodFilter.Add(get.MetadataToken);
 					if (p.SetMethod is { } set) _methodFilter.Add(set.MetadataToken);
@@ -71,20 +72,32 @@ internal static class Utilities
 
 		Memory<IMemberData> memory = members.AsMemory();
 
-		Parallel.Invoke(
-			() => { Span<IMemberData> s = memory.Slice(mIndex, m.Length).Span; for (int i = 0; i < m.Length; i++) if (!_methodFilter.Contains(m[i].MetadataToken)) s[i] = new   MethodData(m[i]); },
-			() => { Span<IMemberData> s = memory.Slice(fIndex, f.Length).Span; for (int i = 0; i < f.Length; i++) if ( !_fieldFilter.Contains(f[i].Name))          s[i] = new    FieldData(f[i]); },
-			() => { Span<IMemberData> s = memory.Slice(eIndex, e.Length).Span; for (int i = 0; i < e.Length; i++)                                                  s[i] = new    EventData(e[i]); },
-			() => { Span<IMemberData> s = memory.Slice(pIndex, p.Length).Span; for (int i = 0; i < p.Length; i++)                                                  s[i] = new PropertyData(p[i]); }
-		);
+		if (filter && (_methodFilter.Count + _fieldFilter.Count != 0))
+		{
+			Parallel.Invoke(
+				() => { Span<IMemberData> s = memory.Slice(mIndex, m.Length).Span; for (int i = 0; i < m.Length; i++) if (!_methodFilter.Contains(m[i].MetadataToken)) s[i] = new   MethodData(m[i]); },
+				() => { Span<IMemberData> s = memory.Slice(fIndex, f.Length).Span; for (int i = 0; i < f.Length; i++) if ( !_fieldFilter.Contains(f[i].Name))          s[i] = new    FieldData(f[i]); },
+				() => { Span<IMemberData> s = memory.Slice(eIndex, e.Length).Span; for (int i = 0; i < e.Length; i++)                                                  s[i] = new    EventData(e[i]); },
+				() => { Span<IMemberData> s = memory.Slice(pIndex, p.Length).Span; for (int i = 0; i < p.Length; i++)                                                  s[i] = new PropertyData(p[i]); }
+			);
 
-		_methodFilter.Clear(); _fieldFilter.Clear();
+			_methodFilter.Clear(); _fieldFilter.Clear();
 
-		Span<IMemberData> span = members; int write = 0;
+			Span<IMemberData> span = members; int write = 0;
 
-		for (int read = 0; read < span.Length; read++) if (span[read] is not null) span[write++] = span[read];
+			for (int read = 0; read < span.Length; read++) if (span[read] is not null) span[write++] = span[read];
 
-		Array.Resize(ref members, write);
+			Array.Resize(ref members, write);
+		}
+		else
+		{
+			Parallel.Invoke(
+				() => { Span<IMemberData> s = memory.Slice(mIndex, m.Length).Span; for (int i = 0; i < m.Length; i++) s[i] = new   MethodData(m[i]); },
+				() => { Span<IMemberData> s = memory.Slice(fIndex, f.Length).Span; for (int i = 0; i < f.Length; i++) s[i] = new    FieldData(f[i]); },
+				() => { Span<IMemberData> s = memory.Slice(eIndex, e.Length).Span; for (int i = 0; i < e.Length; i++) s[i] = new    EventData(e[i]); },
+				() => { Span<IMemberData> s = memory.Slice(pIndex, p.Length).Span; for (int i = 0; i < p.Length; i++) s[i] = new PropertyData(p[i]); }
+			);
+		}
 
 		return members;
 	}
